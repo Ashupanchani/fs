@@ -1,15 +1,20 @@
-require('dotenv').config();
-const express = require('express');
-const path = require('path');
-const fs = require('fs');
-const cors = require('cors');
-const connectDB = require('./config/db');
-const Product = require('./models/Product');
-const { seedProducts } = require('./controllers/productController');
+import 'dotenv/config';
+import express from 'express';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import cors from 'cors';
 
-const productRoutes = require('./routes/productRoutes');
-const cartRoutes = require('./routes/cartRoutes');
-const orderRoutes = require('./routes/orderRoutes');
+import connectDB from './config/db.js';
+import Product from './models/Product.js';
+import { seedProducts } from './controllers/productController.js';
+
+import productRoutes from './routes/productRoutes.js';
+import cartRoutes from './routes/cartRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;

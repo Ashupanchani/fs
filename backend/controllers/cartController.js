@@ -1,10 +1,10 @@
-const Cart = require('../models/Cart');
-const Product = require('../models/Product');
+import Cart from '../models/Cart.js';
+import Product from '../models/Product.js';
 
 // @desc    Get all cart items with populated product info
 // @route   GET /api/cart
 // @access  Public
-exports.getCart = async (req, res) => {
+export const getCart = async (req, res) => {
   try {
     const cartItems = await Cart.find().populate('product');
 
@@ -42,7 +42,7 @@ exports.getCart = async (req, res) => {
 // @desc    Add item to cart or increment quantity
 // @route   POST /api/cart
 // @access  Public
-exports.addToCart = async (req, res) => {
+export const addToCart = async (req, res) => {
   try {
     const { productId, quantity = 1 } = req.body;
 
@@ -92,7 +92,7 @@ exports.addToCart = async (req, res) => {
 // @desc    Update quantity of an item in cart
 // @route   PUT /api/cart/:productId
 // @access  Public
-exports.updateCartItem = async (req, res) => {
+export const updateCartItem = async (req, res) => {
   try {
     const { productId } = req.params;
     const { quantity } = req.body;
@@ -134,7 +134,7 @@ exports.updateCartItem = async (req, res) => {
 // @desc    Remove single item from cart
 // @route   DELETE /api/cart/:productId
 // @access  Public
-exports.removeFromCart = async (req, res) => {
+export const removeFromCart = async (req, res) => {
   try {
     const { productId } = req.params;
     const cartItem = await Cart.findOneAndDelete({ product: productId });
@@ -163,7 +163,7 @@ exports.removeFromCart = async (req, res) => {
 // @desc    Clear entire cart
 // @route   DELETE /api/cart
 // @access  Public
-exports.clearCart = async (req, res) => {
+export const clearCart = async (req, res) => {
   try {
     await Cart.deleteMany({});
     res.status(200).json({

@@ -1,4 +1,4 @@
-const Product = require('../models/Product');
+import Product from '../models/Product.js';
 
 // Fallback products in case external network is offline during viva demonstration
 const fallbackProducts = [
@@ -79,7 +79,7 @@ const fallbackProducts = [
 // @desc    Get all products (with optional search and category filter)
 // @route   GET /api/products
 // @access  Public
-exports.getProducts = async (req, res) => {
+export const getProducts = async (req, res) => {
   try {
     const { category, search, sort } = req.query;
     let query = {};
@@ -120,7 +120,7 @@ exports.getProducts = async (req, res) => {
 // @desc    Get single product by ID
 // @route   GET /api/products/:id
 // @access  Public
-exports.getProductById = async (req, res) => {
+export const getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) {
@@ -145,7 +145,7 @@ exports.getProductById = async (req, res) => {
 // @desc    Create a new product
 // @route   POST /api/products
 // @access  Public / Admin
-exports.createProduct = async (req, res) => {
+export const createProduct = async (req, res) => {
   try {
     const { title, price, description, category, image, stock } = req.body;
 
@@ -182,7 +182,7 @@ exports.createProduct = async (req, res) => {
 // @desc    Update product by ID
 // @route   PUT /api/products/:id
 // @access  Public / Admin
-exports.updateProduct = async (req, res) => {
+export const updateProduct = async (req, res) => {
   try {
     let product = await Product.findById(req.params.id);
     if (!product) {
@@ -214,7 +214,7 @@ exports.updateProduct = async (req, res) => {
 // @desc    Delete product by ID
 // @route   DELETE /api/products/:id
 // @access  Public / Admin
-exports.deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) {
@@ -243,7 +243,7 @@ exports.deleteProduct = async (req, res) => {
 // @desc    Seed products from Public Free API (FakeStore API)
 // @route   POST /api/products/seed
 // @access  Public
-exports.seedProducts = async (req, res) => {
+export const seedProducts = async (req, res) => {
   try {
     let rawProducts = [];
 

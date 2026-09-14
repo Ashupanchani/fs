@@ -1,11 +1,11 @@
-const Order = require('../models/Order');
-const Cart = require('../models/Cart');
-const Product = require('../models/Product');
+import Order from '../models/Order.js';
+import Cart from '../models/Cart.js';
+import Product from '../models/Product.js';
 
 // @desc    Place a new order from current cart
 // @route   POST /api/orders
 // @access  Public
-exports.createOrder = async (req, res) => {
+export const createOrder = async (req, res) => {
   try {
     const name = req.body.name || 'Quick Checkout Customer';
     const email = req.body.email || 'customer@swiftcart.in';
@@ -76,7 +76,7 @@ exports.createOrder = async (req, res) => {
 // @desc    Get all orders
 // @route   GET /api/orders
 // @access  Public
-exports.getOrders = async (req, res) => {
+export const getOrders = async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
 
@@ -97,7 +97,7 @@ exports.getOrders = async (req, res) => {
 // @desc    Get single order by ID
 // @route   GET /api/orders/:id
 // @access  Public
-exports.getOrderById = async (req, res) => {
+export const getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
 
@@ -124,7 +124,7 @@ exports.getOrderById = async (req, res) => {
 // @desc    Update order status
 // @route   PATCH /api/orders/:id/status
 // @access  Public / Admin
-exports.updateOrderStatus = async (req, res) => {
+export const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
     const allowedStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
