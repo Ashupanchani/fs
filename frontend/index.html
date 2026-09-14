@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SwiftCart - Online Shopping Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Main Navigation Header -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <div class="brand" onclick="switchTab('shop')">
+        <div class="brand-icon">🛍️</div>
+        <div>
+          <span class="brand-title">SwiftCart</span>
+          <span class="brand-subtitle">Online Shopping Store</span>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <button class="nav-btn active" id="tab-shop" onclick="switchTab('shop')">Store</button>
+        <button class="nav-btn" id="tab-cart" onclick="switchTab('cart')">
+          Cart <span class="cart-counter" id="cartCount">0</span>
+        </button>
+        <button class="nav-btn" id="tab-orders" onclick="switchTab('orders')">Orders</button>
+        <button class="nav-btn" id="tab-manage" onclick="switchTab('manage')">Manage Products</button>
+        <button class="nav-btn viva-btn" id="tab-viva" onclick="switchTab('viva')">📖 Viva Prep</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Notification Toast Container -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Main Content Area -->
+  <main class="container main-content">
+
+    <!-- ==================== VIEW 1: SHOP CATALOG ==================== -->
+    <section id="view-shop" class="view active-view">
+      <!-- Controls Toolbar -->
+      <div class="catalog-toolbar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search products by title or description..." oninput="handleSearch()">
+        </div>
+
+        <div class="toolbar-actions">
+          <select id="sortSelect" onchange="loadProducts()">
+            <option value="newest">Sort: Newest First</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name-asc">Name: A to Z</option>
+          </select>
+
+          <button class="btn btn-secondary" id="seedBtn" onclick="seedPublicProducts()">
+            🔄 Seed Public API Data
+          </button>
+          <button class="btn btn-primary" onclick="openAddProductModal()">
+            ➕ Add Product
+          </button>
+        </div>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="category-pills" id="categoryPills">
+        <button class="pill active" onclick="filterCategory('all')">All Products</button>
+        <button class="pill" onclick="filterCategory('men\'s clothing')">Men's Clothing</button>
+        <button class="pill" onclick="filterCategory('women\'s clothing')">Women's Clothing</button>
+        <button class="pill" onclick="filterCategory('jewelery')">Jewelry</button>
+        <button class="pill" onclick="filterCategory('electronics')">Electronics</button>
+      </div>
+
+      <!-- Status / Results info -->
+      <div class="results-header">
+        <span id="productResultsCount" class="text-muted">Loading products from database...</span>
+      </div>
+
+      <!-- Product Cards Grid -->
+      <div class="products-grid" id="productsGrid">
+        <!-- Rendered dynamically by JS -->
+      </div>
+    </section>
+
+
+    <!-- ==================== VIEW 2: SHOPPING CART ==================== -->
+    <section id="view-cart" class="view">
+      <div class="view-header">
+        <h2>Your Shopping Cart</h2>
+        <p class="text-muted">Review items, adjust quantities, and checkout.</p>
+      </div>
+
+      <div class="cart-layout" id="cartLayout">
+        <div class="cart-items-container">
+          <div class="cart-actions-bar">
+            <span id="cartTotalItemsText">0 items in your cart</span>
+            <button class="btn btn-sm btn-outline-danger" onclick="clearEntireCart()">🗑️ Clear Cart</button>
+          </div>
+          <div id="cartItemsList" class="cart-items-list">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Order Summary & Checkout Card -->
+        <div class="cart-summary-card">
+          <h3>Order Summary</h3>
+          <div class="summary-line">
+            <span>Subtotal</span>
+            <span id="summarySubtotal">₹0.00</span>
+          </div>
+          <div class="summary-line">
+            <span>Tax (5% GST)</span>
+            <span id="summaryTax">₹0.00</span>
+          </div>
+          <div class="summary-line">
+            <span>Shipping</span>
+            <span class="text-success">FREE</span>
+          </div>
+          <hr class="divider">
+          <div class="summary-line total-line">
+            <span>Grand Total</span>
+            <span id="summaryTotal">₹0.00</span>
+          </div>
+
+          <button class="btn btn-primary btn-block checkout-btn" id="proceedPaymentBtn" onclick="proceedToPayment()">
+            Proceed to Payment 💳
+          </button>
+        </div>
+      </div>
+
+      <!-- Empty Cart State -->
+      <div id="emptyCartState" class="empty-state hidden">
+        <div class="empty-icon">🛒</div>
+        <h3>Your Cart is Empty</h3>
+        <p class="text-muted">Explore our catalog and add some products to get started.</p>
+        <button class="btn btn-primary" onclick="switchTab('shop')">Browse Products</button>
+      </div>
+    </section>
+
+
+    <!-- ==================== VIEW 3: ORDERS HISTORY ==================== -->
+    <section id="view-orders" class="view">
+      <div class="view-header">
+        <h2>Placed Orders</h2>
+        <p class="text-muted">Complete history of orders stored in MongoDB.</p>
+      </div>
+
+      <div id="ordersList" class="orders-list">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Empty Orders State -->
+      <div id="emptyOrdersState" class="empty-state hidden">
+        <div class="empty-icon">📦</div>
+        <h3>No Orders Placed Yet</h3>
+        <p class="text-muted">Items purchased from your cart will appear here.</p>
+        <button class="btn btn-primary" onclick="switchTab('shop')">Start Shopping</button>
+      </div>
+    </section>
+
+
+    <!-- ==================== VIEW 4: PRODUCT MANAGEMENT (CRUD ADMIN) ==================== -->
+    <section id="view-manage" class="view">
+      <div class="view-header flex-between">
+        <div>
+          <h2>Manage Products (CRUD Operations)</h2>
+          <p class="text-muted">Full administrative control: Create, Read, Update, and Delete products in MongoDB.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddProductModal()">➕ Add New Product</button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Title</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminProductsTableBody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <!-- ==================== VIEW 5: VIVA & CIA ORAL GUIDE ==================== -->
+    <section id="view-viva" class="view">
+      <div class="view-header">
+        <h2>🎓 CIA Oral Exam & Viva Reference Guide</h2>
+        <p class="text-muted">Study guide covering all 15 endpoints, architectural decisions, and common viva questions.</p>
+      </div>
+
+      <!-- 15 Endpoints Reference Table -->
+      <div class="viva-card">
+        <h3>📋 15 RESTful API Endpoints Implemented</h3>
+        <div class="table-responsive">
+          <table class="api-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Method</th>
+                <th>Endpoint</th>
+                <th>CRUD</th>
+                <th>Description</th>
+                <th>Success Code</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td><span class="method get">GET</span></td><td>/api/products</td><td>Read</td><td>Get all products (supports ?category=&search=&sort=)</td><td>200 OK</td></tr>
+              <tr><td>2</td><td><span class="method get">GET</span></td><td>/api/products/:id</td><td>Read</td><td>Get single product details by MongoDB _id</td><td>200 OK</td></tr>
+              <tr><td>3</td><td><span class="method post">POST</span></td><td>/api/products</td><td>Create</td><td>Create a new product with validation</td><td>201 Created</td></tr>
+              <tr><td>4</td><td><span class="method put">PUT</span></td><td>/api/products/:id</td><td>Update</td><td>Update product fields by ID</td><td>200 OK</td></tr>
+              <tr><td>5</td><td><span class="method delete">DELETE</span></td><td>/api/products/:id</td><td>Delete</td><td>Delete product by MongoDB _id</td><td>200 OK</td></tr>
+              <tr><td>6</td><td><span class="method post">POST</span></td><td>/api/products/seed</td><td>Create</td><td>Fetch from public FakeStore API & seed to DB</td><td>201 Created</td></tr>
+              <tr><td>7</td><td><span class="method get">GET</span></td><td>/api/cart</td><td>Read</td><td>Fetch cart with populated product data & totals</td><td>200 OK</td></tr>
+              <tr><td>8</td><td><span class="method post">POST</span></td><td>/api/cart</td><td>Create</td><td>Add product or increment cart item quantity</td><td>201 Created</td></tr>
+              <tr><td>9</td><td><span class="method put">PUT</span></td><td>/api/cart/:productId</td><td>Update</td><td>Update item quantity in cart</td><td>200 OK</td></tr>
+              <tr><td>10</td><td><span class="method delete">DELETE</span></td><td>/api/cart/:productId</td><td>Delete</td><td>Remove single item from cart</td><td>200 OK</td></tr>
+              <tr><td>11</td><td><span class="method delete">DELETE</span></td><td>/api/cart</td><td>Delete</td><td>Clear all items in cart</td><td>200 OK</td></tr>
+              <tr><td>12</td><td><span class="method post">POST</span></td><td>/api/orders</td><td>Create</td><td>Checkout: create order, deduct stock, clear cart</td><td>201 Created</td></tr>
+              <tr><td>13</td><td><span class="method get">GET</span></td><td>/api/orders</td><td>Read</td><td>Retrieve all placed customer orders</td><td>200 OK</td></tr>
+              <tr><td>14</td><td><span class="method get">GET</span></td><td>/api/orders/:id</td><td>Read</td><td>Get single order details by ID</td><td>200 OK</td></tr>
+              <tr><td>15</td><td><span class="method patch">PATCH</span></td><td>/api/orders/:id/status</td><td>Update</td><td>Update order status (Pending, Shipped, Delivered)</td><td>200 OK</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Oral Viva Q&A Accordion -->
+      <div class="viva-card">
+        <h3>💡 Top CIA Oral Questions & Direct Answers</h3>
+
+        <div class="qa-block">
+          <div class="qa-q">Q1: Explain the architecture of this application.</div>
+          <div class="qa-a">
+            This is a <strong>3-tier full-stack web application</strong> built on the <strong>MVC (Model-View-Controller)</strong> design pattern:
+            <ul>
+              <li><strong>Model:</strong> Mongoose schemas (<code>Product</code>, <code>Cart</code>, <code>Order</code>) define data structure and validation rules in MongoDB.</li>
+              <li><strong>Controller:</strong> Business logic functions (e.g., calculating totals, deducting stock, seeding from external APIs).</li>
+              <li><strong>Routes:</strong> Express routers mapping RESTful endpoints (GET, POST, PUT, DELETE, PATCH).</li>
+              <li><strong>View:</strong> Responsive frontend communicating via asynchronous <code>fetch()</code> API calls.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="qa-block">
+          <div class="qa-q">Q2: How is MongoDB integrated with Node.js?</div>
+          <div class="qa-a">
+            We use <strong>Mongoose</strong>, an Object Data Modeling (ODM) library for MongoDB and Node.js. <code>mongoose.connect()</code> establishes an asynchronous connection using the connection URI stored securely in <code>.env</code>. Mongoose models enforce schema validation and provide high-level CRUD methods like <code>.find()</code>, <code>.findByIdAndUpdate()</code>, and <code>.deleteMany()</code>.
+          </div>
+        </div>
+
+        <div class="qa-block">
+          <div class="qa-q">Q3: How are public free APIs utilized for products?</div>
+          <div class="qa-a">
+            Our backend controller exposes <code>POST /api/products/seed</code>, which calls the free public <strong>FakeStore API</strong> (<code>https://fakestoreapi.com/products</code>) using native <code>fetch</code>. It transforms the incoming JSON into our Mongoose schema format, clears previous records, and saves them into local MongoDB using <code>Product.insertMany()</code>.
+          </div>
+        </div>
+
+        <div class="qa-block">
+          <div class="qa-q">Q4: What is the difference between PUT and PATCH?</div>
+          <div class="qa-a">
+            <strong>PUT</strong> is used for replacing or updating an entire resource representation (e.g. updating all fields of a product or cart item quantity).<br>
+            <strong>PATCH</strong> applies partial modifications to a resource (e.g., only updating the <code>status</code> field of an order without altering its items or customer info).
+          </div>
+        </div>
+
+        <div class="qa-block">
+          <div class="qa-q">Q5: How does checkout ensure data consistency?</div>
+          <div class="qa-a">
+            When <code>POST /api/orders</code> is triggered:
+            <ol>
+              <li>It validates that the cart is not empty.</li>
+              <li>Snapshots current item details (title, price, quantity) into the order.</li>
+              <li>Decrements product stock using Mongoose <code>$inc: { stock: -quantity }</code>.</li>
+              <li>Clears the cart with <code>Cart.deleteMany({})</code> once the order is persisted.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="qa-block">
+          <div class="qa-q">Q6: What HTTP status codes are used and why?</div>
+          <div class="qa-a">
+            <ul>
+              <li><strong>200 OK:</strong> Successful GET, PUT, PATCH, or DELETE request.</li>
+              <li><strong>201 Created:</strong> Successful POST request that created a new resource (e.g. product, cart item, order).</li>
+              <li><strong>400 Bad Request:</strong> Client sent invalid or missing payload data.</li>
+              <li><strong>404 Not Found:</strong> Resource with specified ID does not exist.</li>
+              <li><strong>500 Internal Server Error:</strong> Database or unhandled server exception.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- Modal: Product Create / Edit -->
+  <div id="productModal" class="modal hidden">
+    <div class="modal-backdrop" onclick="closeProductModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="productModalTitle">Add New Product</h3>
+        <button class="close-btn" onclick="closeProductModal()">✕</button>
+      </div>
+      <form id="productForm" onsubmit="handleProductFormSubmit(event)">
+        <input type="hidden" id="editProductId">
+
+        <div class="form-group">
+          <label for="prodTitle">Product Title *</label>
+          <input type="text" id="prodTitle" required placeholder="e.g. Wireless Noise-Cancelling Headphones">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="prodPrice">Price (₹) *</label>
+            <input type="number" id="prodPrice" step="0.01" min="0" required placeholder="1499">
+          </div>
+          <div class="form-group">
+            <label for="prodStock">Stock Quantity</label>
+            <input type="number" id="prodStock" min="0" value="25">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="prodCategory">Category *</label>
+          <select id="prodCategory" required>
+            <option value="electronics">Electronics</option>
+            <option value="men's clothing">Men's Clothing</option>
+            <option value="women's clothing">Women's Clothing</option>
+            <option value="jewelery">Jewelry</option>
+            <option value="general">General</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="prodImage">Image URL</label>
+          <input type="url" id="prodImage" placeholder="https://example.com/image.jpg">
+        </div>
+
+        <div class="form-group">
+          <label for="prodDesc">Description</label>
+          <textarea id="prodDesc" rows="3" placeholder="Brief product description..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeProductModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveProductBtn">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <p>© SwiftCart • Online Store</p>
+      <div class="footer-links">
+        <a href="javascript:void(0)" onclick="switchTab('shop')">Store</a>
+        <a href="javascript:void(0)" onclick="switchTab('viva')">Viva Guide</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
