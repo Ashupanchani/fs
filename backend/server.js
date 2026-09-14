@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const Product = require('./models/Product');
@@ -32,8 +33,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static frontend assets
-app.use(express.static(path.join(__dirname, '../frontend')));
+// Serve static frontend assets (supports built Vite React app or dev directory)
+const frontendDist = path.join(__dirname, '../frontend/dist');
+const frontendDir = fs.existsSync(frontendDist) ? frontendDist : path.join(__dirname, '../frontend');
+app.use(express.static(frontendDir));
 
 // API Directory / Health check endpoint
 app.get('/api', (req, res) => {
@@ -79,7 +82,10 @@ app.use('/api/orders', orderRoutes);
 // Fallback for HTML5 client routing (Express 5 compatible)
 app.use((req, res, next) => {
   if (req.method === 'GET' && !req.path.startsWith('/api')) {
-    return res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
+    const indexPath = fs.existsSync(path.join(frontendDist, 'index.html'))
+      ? path.join(frontendDist, 'index.html')
+      : path.join(__dirname, '../frontend', 'index.html');
+    return res.sendFile(indexPath);
   }
   next();
 });

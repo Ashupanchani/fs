@@ -1,13 +1,14 @@
 {
   "name": "assignment-fs",
   "version": "1.0.0",
-  "description": "Full-stack E-Commerce Assessment - Modular Architecture",
+  "description": "Full-stack E-Commerce Assessment - React TypeScript & Express MongoDB",
   "scripts": {
     "start": "npm --prefix backend start",
-    "dev": "npm --prefix backend run dev",
+    "backend": "npm --prefix backend run dev",
+    "frontend": "npm --prefix frontend run dev",
+    "build:frontend": "npm --prefix frontend run build",
     "seed": "npm --prefix backend run seed",
-    "test-api": "npm --prefix backend run test-api",
-    "backend": "npm --prefix backend run dev"
+    "test-api": "npm --prefix backend run test-api"
   },
   "keywords": [],
   "author": "",

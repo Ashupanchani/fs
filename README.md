@@ -1,6 +1,6 @@
-# Full-Stack E-Commerce Web Application
+# Full-Stack E-Commerce Web Application (React + TypeScript & Node.js Express + MongoDB)
 
-This project is divided into dedicated **frontend** and **backend** folders for a clean, modular full-stack architecture.
+A modern full-stack e-commerce application built with **React + TypeScript (Vite)** on the frontend and **Node.js Express + MongoDB** on the backend.
 
 ---
 
@@ -8,35 +8,42 @@ This project is divided into dedicated **frontend** and **backend** folders for 
 
 ```
 assignment-fs/
-├── frontend/                     # Client-side presentation layer
-│   ├── index.html                # Main SPA interface
-│   ├── css/
-│   │   └── style.css             # Vanilla CSS design system & responsive styling
-│   └── js/
-│       └── app.js                # Frontend controllers, API fetch client & DOM logic
+├── frontend/                     # React + TypeScript Presentation Layer
+│   ├── src/
+│   │   ├── components/           # Reusable Modular Components
+│   │   │   ├── Navbar.tsx        # Navigation bar with brand, tabs & cart counter
+│   │   │   ├── CategoryFilter.tsx# Search input, sort & category pills
+│   │   │   ├── ProductCard.tsx   # Reusable product card with stepper & actions
+│   │   │   ├── ProductGrid.tsx   # Product catalog grid with loading skeleton
+│   │   │   ├── ProductModal.tsx  # Product Add / Edit modal with validation
+│   │   │   ├── CartView.tsx      # Cart line items & checkout form
+│   │   │   ├── OrderHistory.tsx  # Order history & status fulfillment
+│   │   │   ├── Toast.tsx         # Floating feedback notifications
+│   │   │   └── Modal.tsx         # Accessible dialog overlay
+│   │   ├── services/
+│   │   │   └── api.ts            # Strongly-typed API client for 16 endpoints
+│   │   ├── types/
+│   │   │   └── index.ts          # TypeScript interfaces (Product, Cart, Order, etc.)
+│   │   ├── App.tsx               # Main application container
+│   │   ├── main.tsx              # React entry point
+│   │   └── index.css             # Glassmorphic CSS design system
+│   ├── index.html                # HTML entry point with Google Fonts
+│   ├── vite.config.ts            # Vite config with /api proxy to backend:5000
+│   ├── tsconfig.json             # TypeScript compiler configuration
+│   └── package.json              # Frontend dependencies (React, TypeScript, Vite)
 │
-├── backend/                      # Server-side REST API & database layer
+├── backend/                      # Node.js Express & MongoDB REST API Layer
 │   ├── config/
-│   │   └── db.js                 # MongoDB Mongoose connection
-│   ├── controllers/              # Business logic controllers
-│   │   ├── productController.js  # Product CRUD & public API seeder
-│   │   ├── cartController.js     # Shopping cart operations
-│   │   └── orderController.js    # Order checkout & status fulfillment
-│   ├── models/                   # Mongoose database schemas
-│   │   ├── Product.js            # Product schema with validation
-│   │   ├── Cart.js               # Cart schema with calculated subtotal
-│   │   └── Order.js              # Order schema with shipping & timeline
-│   ├── routes/                   # Express route definitions
-│   │   ├── productRoutes.js      # /api/products endpoints
-│   │   ├── cartRoutes.js         # /api/cart endpoints
-│   │   └── orderRoutes.js        # /api/orders endpoints
-│   ├── .env                      # Environment variables (PORT, MONGODB_URI)
-│   ├── server.js                 # Express server & static frontend serving
-│   ├── test-apis.js              # Automated test suite (16 tests)
+│   │   └── db.js                 # Mongoose MongoDB connection
+│   ├── controllers/              # MVC Controllers (Product, Cart, Order)
+│   ├── models/                   # Mongoose Data Models (Product, Cart, Order)
+│   ├── routes/                   # Express REST Route Handlers
+│   ├── .env                      # Environment Variables (PORT, MONGODB_URI)
+│   ├── server.js                 # Express server & static asset serving
+│   ├── test-apis.js              # 16-endpoint automated test suite
 │   └── package.json              # Backend dependencies
 │
 ├── package.json                  # Root orchestration scripts
-├── VIVA_QUESTIONS.md             # Theoretical & viva assessment questions
 └── README.md
 ```
 
@@ -45,52 +52,62 @@ assignment-fs/
 ## 🚀 Getting Started
 
 ### 1. Install Dependencies
-Dependencies are already installed in `backend/`. If you ever need to reinstall:
+
+**Backend:**
 ```bash
 cd backend
 npm install
 ```
 
-### 2. Start the Application
-
-You can start the server directly from the root folder or from `backend/`:
-
-**From root folder:**
+**Frontend:**
 ```bash
-npm start
-# or for auto-reloading dev mode:
-npm run dev
+cd frontend
+npm install
 ```
-
-**From `backend/` folder:**
-```bash
-cd backend
-npm start
-# or:
-npm run dev
-```
-
-The application will be accessible at:
-- **Web App:** [http://localhost:5000](http://localhost:5000)
-- **API Directory:** [http://localhost:5000/api](http://localhost:5000/api)
-- **Health Check:** [http://localhost:5000/api/health](http://localhost:5000/api/health)
-
-### 3. Standalone Frontend Development (Optional)
-If you prefer running the frontend using **Live Server** (e.g. port `5500` or `3000`), the frontend's API client will automatically direct all `/api` calls to `http://localhost:5000` with CORS preconfigured.
 
 ---
 
-## 🧪 Running Automated Tests
+### 2. Run in Development Mode
 
-To test all 16 endpoints across Products, Cart, and Orders:
+Open two terminal windows:
 
-**From root folder:**
-```bash
-npm run test-api
-```
-
-**From `backend/` folder:**
+**Terminal 1 (Backend API):**
 ```bash
 cd backend
+npm run dev
+```
+Backend runs at: `http://localhost:5000`
+
+**Terminal 2 (Frontend React + TypeScript):**
+```bash
+cd frontend
+npm run dev
+```
+Frontend runs at: `http://localhost:5173` (with hot module replacement & API proxy to port 5000)
+
+*Or from the root directory:*
+- `npm run backend` (starts backend)
+- `npm run frontend` (starts frontend)
+
+---
+
+### 3. Build & Production Run
+
+Build the React + TypeScript frontend bundle:
+```bash
+npm run build:frontend
+```
+This outputs compiled assets into `frontend/dist`. Then simply run:
+```bash
+npm start
+```
+The Express backend will serve the compiled React TypeScript application directly at `http://localhost:5000`.
+
+---
+
+## 🧪 Automated Testing
+
+Run all 16 endpoint CRUD tests:
+```bash
 npm run test-api
 ```
