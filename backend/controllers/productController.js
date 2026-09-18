@@ -1,80 +1,5 @@
 import Product from '../models/Product.js';
 
-// Fallback products in case external network is offline during viva demonstration
-const fallbackProducts = [
-  {
-    title: 'Fjallraven - Foldsack No. 1 Backpack',
-    price: 109.95,
-    description: 'Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve.',
-    category: "men's clothing",
-    image: 'https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg',
-    rating: { rate: 3.9, count: 120 },
-    stock: 15,
-  },
-  {
-    title: 'Mens Casual Premium Slim Fit T-Shirts',
-    price: 22.3,
-    description: 'Slim-fitting style, contrast raglan long sleeve, three-button henley placket, light weight & soft fabric.',
-    category: "men's clothing",
-    image: 'https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg',
-    rating: { rate: 4.1, count: 259 },
-    stock: 30,
-  },
-  {
-    title: 'Mens Cotton Jacket',
-    price: 55.99,
-    description: 'Great outerwear jackets for Spring/Autumn/Winter, suitable for many occasions, such as working, hiking, camping.',
-    category: "men's clothing",
-    image: 'https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg',
-    rating: { rate: 4.7, count: 500 },
-    stock: 20,
-  },
-  {
-    title: 'John Hardy Women\'s Legends Naga Gold & Silver Dragon Bracelet',
-    price: 695.0,
-    description: 'From our Legends Collection, the Naga was inspired by the mythical water dragon that protects the ocean\'s pearl.',
-    category: 'jewelery',
-    image: 'https://fakestoreapi.com/img/71pWzhdJNwL._AC_UL640_QL65_ML3_.jpg',
-    rating: { rate: 4.6, count: 400 },
-    stock: 8,
-  },
-  {
-    title: 'WD 2TB Elements Portable External Hard Drive - USB 3.0',
-    price: 64.0,
-    description: 'USB 3.0 and USB 2.0 Compatibility Fast data transfers Improve PC Performance High Capacity.',
-    category: 'electronics',
-    image: 'https://fakestoreapi.com/img/61IBBVJvSDL._AC_SY879_.jpg',
-    rating: { rate: 3.3, count: 203 },
-    stock: 45,
-  },
-  {
-    title: 'SanDisk SSD PLUS 1TB Internal SSD - SATA III 6 Gb/s',
-    price: 109.0,
-    description: 'Easy upgrade for faster boot up, shutdown, application load and response.',
-    category: 'electronics',
-    image: 'https://fakestoreapi.com/img/61U7T1koQqL._AC_SX679_.jpg',
-    rating: { rate: 2.9, count: 470 },
-    stock: 25,
-  },
-  {
-    title: 'BIYLACLESEN Women\'s 3-in-1 Snowboard Jacket Winter Coat',
-    price: 56.99,
-    description: 'Note:The Jackets is US standard size, Please choose size as your usual wear. Detachable fleece liner.',
-    category: "women's clothing",
-    image: 'https://fakestoreapi.com/img/51Y5NI-I5jL._AC_UX679_.jpg',
-    rating: { rate: 2.6, count: 235 },
-    stock: 18,
-  },
-  {
-    title: 'Lock and Love Women\'s Removable Hooded Faux Leather Moto Jacket',
-    price: 29.95,
-    description: '100% POLYURETHANE (shell) 100% POLYESTER (lining). Faux leather material for style and comfort with 2 pockets.',
-    category: "women's clothing",
-    image: 'https://fakestoreapi.com/img/81XH0e8fefL._AC_UY879_.jpg',
-    rating: { rate: 3.9, count: 340 },
-    stock: 22,
-  },
-];
 
 // @desc    Get all products (with optional search and category filter)
 // @route   GET /api/products
@@ -96,10 +21,10 @@ export const getProducts = async (req, res) => {
       ];
     }
 
-    let sortOption = { createdAt: -1 };
-    if (sort === 'price-asc') sortOption = { price: 1 };
-    if (sort === 'price-desc') sortOption = { price: -1 };
-    if (sort === 'name-asc') sortOption = { title: 1 };
+    let sortOption = { createdAt: -1 }; //newest product first
+    if (sort === 'price-asc') sortOption = { price: 1 }; //price ascending
+    if (sort === 'price-desc') sortOption = { price: -1 }; //price descending
+    if (sort === 'name-asc') sortOption = { title: 1 }; //name ascending
 
     const products = await Product.find(query).sort(sortOption);
 
@@ -193,8 +118,8 @@ export const updateProduct = async (req, res) => {
     }
 
     product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
+      new: true, // ask mongoose to return the newly updated document
+      runValidators: true, // runs schema validation rules on update
     });
 
     res.status(200).json({
@@ -245,26 +170,14 @@ export const deleteProduct = async (req, res) => {
 // @access  Public
 export const seedProducts = async (req, res) => {
   try {
-    let rawProducts = [];
-
-    // Try fetching from public free FakeStore API with a timeout
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6000);
-      const response = await fetch('https://fakestoreapi.com/products?limit=12', {
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-
-      if (response.ok) {
-        rawProducts = await response.json();
-      }
-    } catch (fetchErr) {
-      console.warn('FakeStore API fetch failed or timed out, using verified sample product dataset:', fetchErr.message);
+    const response = await fetch('https://fakestoreapi.com/products?limit=12');
+    if (!response.ok) {
+      throw new Error(`Public API returned status: ${response.status}`);
     }
 
+    const rawProducts = await response.json();
     if (!rawProducts || rawProducts.length === 0) {
-      rawProducts = fallbackProducts;
+      throw new Error('No products returned from external Public API');
     }
 
     // Format products for MongoDB model

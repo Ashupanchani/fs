@@ -13,8 +13,8 @@ export const createOrder = async (req, res) => {
     const phone = req.body.phone || '+91 9876543210';
 
     // Retrieve items from cart
-    const cartItems = await Cart.find().populate('product');
-    const validItems = cartItems.filter((item) => item.product !== null);
+    const cartItems = await Cart.find().populate('product'); // populate is join query
+    const validItems = cartItems.filter((item) => item.product !== null); // item is in the cart but the admin removed that product so it will show null so it is removing that product which is null
 
     if (validItems.length === 0) {
       return res.status(400).json({

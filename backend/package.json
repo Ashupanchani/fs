@@ -7,8 +7,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "seed": "node -e \"import('./config/db.js').then(d => d.default()).then(() => import('./controllers/productController.js')).then(m => m.seedProducts()).then(() => { console.log('Seeding complete!'); process.exit(0); })\"",
-    "test-api": "node test-apis.js"
+    "seed": "node -e \"import('./config/db.js').then(d => d.default()).then(() => import('./controllers/productController.js')).then(m => m.seedProducts()).then(() => { console.log('Seeding complete!'); process.exit(0); })\""
   },
   "dependencies": {
     "cors": "^2.8.6",

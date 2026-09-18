@@ -39,8 +39,7 @@ assignment-fs/
 │   ├── models/                   # Mongoose Data Models (Product, Cart, Order)
 │   ├── routes/                   # Express REST Route Handlers
 │   ├── .env                      # Environment Variables (PORT, MONGODB_URI)
-│   ├── server.js                 # Express server & static asset serving
-│   ├── test-apis.js              # 16-endpoint automated test suite
+│   ├── server.js                 # Express REST API server
 │   └── package.json              # Backend dependencies
 │
 ├── package.json                  # Root orchestration scripts
@@ -91,23 +90,16 @@ Frontend runs at: `http://localhost:5173` (with hot module replacement & API pro
 
 ---
 
-### 3. Build & Production Run
+### 3. Production Build
 
 Build the React + TypeScript frontend bundle:
 ```bash
 npm run build:frontend
 ```
-This outputs compiled assets into `frontend/dist`. Then simply run:
+This compiles the production assets into `frontend/dist`.
+
+Start the backend API server:
 ```bash
 npm start
 ```
-The Express backend will serve the compiled React TypeScript application directly at `http://localhost:5000`.
-
----
-
-## 🧪 Automated Testing
-
-Run all 16 endpoint CRUD tests:
-```bash
-npm run test-api
-```
+The Express backend runs at `http://localhost:5000`.
